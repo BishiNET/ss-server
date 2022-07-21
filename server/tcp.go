@@ -40,12 +40,12 @@ func resolve(domain []byte) (string, bool, error) {
 	if len(IPs) > 1 {
 		ips := IPs[rand.Intn(len(IPs))]
 		if doIPCheck(ips) {
-			return "", true, errors.New("no record")
+			return "", true, errors.New("private addr")
 		}
 		return ips.String(), false, nil
 	}
 	if doIPCheck(IPs[0]) {
-		return "", true, errors.New("no record")
+		return "", true, errors.New("private addr")
 	}
 	return IPs[0].String(), false, nil
 }
