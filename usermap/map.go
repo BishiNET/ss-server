@@ -37,8 +37,8 @@ func (u UserMap) AddUser(name, cipher, password, port string) error {
 }
 
 func (u UserMap) DeleteUser(name string) {
-	rwlock.RLock()
-	defer rwlock.RUnlock()
+	rwlock.Lock()
+	defer rwlock.Unlock()
 	u[name].Shutdown()
 	delete(u, name)
 }
