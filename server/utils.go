@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-var (
-	_, local1, _ = net.ParseCIDR("10.0.0.0/8")
-	_, local2, _ = net.ParseCIDR("172.16.0.0/12")
-	_, local3, _ = net.ParseCIDR("192.168.0.0/16")
-	_, local4, _ = net.ParseCIDR("127.0.0.0/8")
-	_, local5, _ = net.ParseCIDR("0.0.0.0/8")
-)
-
 // Source: https://github.com/Dreamacro/clash/blob/master/adapter/outbound/util.go#L14
 func tcpKeepAlive(c net.Conn) {
 	if tcp, ok := c.(*net.TCPConn); ok {
@@ -21,7 +13,11 @@ func tcpKeepAlive(c net.Conn) {
 	}
 }
 
-// Thanks to https://github.com/shadowsocks/go-shadowsocks2/pull/233
 func doIPCheck(ip net.IP) bool {
-	return local1.Contains(ip) || local2.Contains(ip) || local3.Contains(ip) || local4.Contains(ip) || local5.Contains(ip)
+	if ip4 := ip.To4(); ip4 != nil {
+		return ip4[0] == 10 || ip4[0] == 127 || ip4[0] == 0 ||
+			(ip4[0] == 172 && ip4[1]&0xf0 == 16) ||
+			(ip4[0] == 192 && ip4[1] == 168)
+	}
+	return len(ip) == net.IPv6len && (ip[0]&0xfe == 0xfc || ip.Equal(net.IPv6loopback))
 }
